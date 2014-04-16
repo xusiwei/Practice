@@ -1,0 +1,7 @@
+# ignore .out file
+*.out
+
+# ignore obj file
+*.o
+*.obj
+
