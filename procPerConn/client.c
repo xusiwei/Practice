@@ -8,7 +8,6 @@
 #include <string.h>
 #include <errno.h>
 
-#define SERVER_PORT 8080
 #define ECHO_MSG "hello, server!"
 
 void send_echo(int);
@@ -21,6 +20,9 @@ void send_echo(int);
 
 #define TRACE(fmt, expr) printf(#expr ": " fmt, expr)
 
+const char* server_host = NULL;
+int server_port = 0;
+
 int main(int argc, char **argv)
 {
 	int sock, ret; 
@@ -29,10 +31,13 @@ int main(int argc, char **argv)
 
 	struct sockaddr_in server_addr, client_addr;
 
-	if(argc < 2) {
-		printf("usage: %s server_address\n", argv[0]);
+	if(argc < 3) {
+		printf("usage: %s host port\n", argv[0]);
 		exit(-1);
 	}
+
+	server_host = argv[1];
+	server_port = atol(argv[2]);
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	CHECK_FAILED((-1 == sock), "socket error, ");
@@ -41,11 +46,11 @@ int main(int argc, char **argv)
 	// memset(&addr, 0, sizeof(struct sockaddr_in));
 	bzero(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVER_PORT);
-	inet_pton(AF_INET, argv[1], &server_addr.sin_addr);
+	server_addr.sin_port = htons(server_port);
+	inet_pton(AF_INET, server_host, &server_addr.sin_addr);
 
 	ret = connect(sock, (const struct sockaddr*)&server_addr, sizeof(server_addr));
-	CHECK_FAILED((-1 == ret), "bind error, ");
+	CHECK_FAILED((-1 == ret), "connect error, ");
 	TRACE("(connet): %d\n", ret);
 
 	send_echo(sock);

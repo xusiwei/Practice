@@ -7,7 +7,6 @@
 #include <string.h>
 #include <errno.h>
 
-#define SERVER_PORT 8080
 #define LISTENQ     5
 
 void do_echo(int);
@@ -20,6 +19,8 @@ void do_echo(int);
 
 #define TRACE(fmt, expr) printf(#expr ": " fmt, expr)
 
+int server_port = 0;
+
 int main(int argc, char **argv)
 {
 	int sock, ret; 
@@ -29,6 +30,13 @@ int main(int argc, char **argv)
 
 	struct sockaddr_in server_addr, client_addr;
 
+	if(argc < 2)
+	{
+		printf("usage: %s port\n", argv[0]);
+		exit(-1);
+	}
+	server_port = atol(argv[1]);
+
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	CHECK_FAILED((-1 == sock), "socket error, ");
 	TRACE("%d\n", sock);
@@ -37,7 +45,7 @@ int main(int argc, char **argv)
 	bzero(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	server_addr.sin_port = htons(SERVER_PORT);
+	server_addr.sin_port = htons(server_port);
 
 	ret = bind(sock, (const struct sockaddr*)&server_addr, sizeof(server_addr));
 	CHECK_FAILED((-1 == ret), "bind error, ");

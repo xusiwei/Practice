@@ -1,5 +1,12 @@
 # ignore .out file
 *.out
+*
+!*.c
+!*.cc
+!*.cpp
+
+!*.h
+!*.hpp
 
 # ignore obj file
 *.o
