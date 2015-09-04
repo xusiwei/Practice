@@ -39,7 +39,7 @@ producer activity:
 	3. put it to buffer.
 	4. signal consumer.
 */
-void *producerProc(void* args)
+void *producerWork(void* args)
 {
 	item_t item;
 	size_t latency = (size_t)args;
@@ -65,7 +65,7 @@ void *producerProc(void* args)
 		
 		pthread_mutex_unlock(&lock);
 		
-		// 4. signal consumer.
+		// 4. notify consumer.
 		printf("[producer] Hey! I was produced item %d.\n", item);
 		pthread_cond_signal(&cond_produce);
 		
@@ -81,7 +81,7 @@ consumer activity:
 	3. consume it.
 	4. signal producer.
 */
-void *consumerProc(void* args)
+void *consumerWork(void* args)
 {
 	item_t item;
 	size_t latency = (size_t)args;
@@ -105,7 +105,7 @@ void *consumerProc(void* args)
 		// 3. consume it.
 		printf("  [CONSUMER] I am consumming item %d...\n", item);
 		
-		// 4. signal producer.
+		// 4. notify producer.
 		printf("  [CONSUMER] Hey! I was consumed item %d.\n", item);
 		pthread_cond_signal(&cond_consume);
 		
@@ -126,8 +126,8 @@ int main(int argc, char *argv[])
 	// srand(time(NULL));
 	memset(buffer, -1, sizeof(buffer));
 	
-	pthread_create(&producer, NULL, producerProc, (void*)PRODUCE_LATENCY);
-	pthread_create(&consumer, NULL, consumerProc, (void*)CONSOME_LATENCY);
+	pthread_create(&producer, NULL, producerWork, (void*)PRODUCE_LATENCY);
+	pthread_create(&consumer, NULL, consumerWork, (void*)CONSOME_LATENCY);
 	
 	msleep(100);
 
